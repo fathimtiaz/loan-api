@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Loan;
-use App\Models\LoanTerm;
+use Illuminate\Validation\ValidationException;
 use App\Models\Repayment;
 use Illuminate\Support\Facades\DB;
 
@@ -59,6 +59,13 @@ class RepaymentController extends Controller
         } catch (\Exception $e) {
             report($e);
             DB::rollback();
+            
+            if ($e instanceof ValidationException) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ], 400);
+            }
             return response()->json([
                 'status' => 'error',
                 'message' => 'internal server error'
@@ -67,7 +74,7 @@ class RepaymentController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'overpay' => ($overpay>0) ? $overpay : 0,
+            'overpay' => ($overpay != NULL && $overpay>0) ? $overpay : 0,
             'loan' => $loan
         ], 200);
     }
@@ -101,10 +108,7 @@ class RepaymentController extends Controller
 
             // repay amount should be more than current scheduled amount
             if ($repay_amount == $request->amount && $repay_amount < $this_loan_term_unpaid_amount) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'repayment amount is less than scheduled amount'
-                ], 400);
+                throw ValidationException::withMessages(['message' => 'repayment amount is less than current term unpaid amount']);
             }
 
             // update this loan term
