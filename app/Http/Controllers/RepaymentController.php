@@ -23,6 +23,7 @@ class RepaymentController extends Controller
             $loan = Loan::where('id', $loan_id)
                 ->firstOrFail();
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'status' => 'error',
                 'message' => 'loan not found'
@@ -56,7 +57,7 @@ class RepaymentController extends Controller
              
             DB::commit();
         } catch (\Exception $e) {
-            print_r($e->getMessage());
+            report($e);
             DB::rollback();
             return response()->json([
                 'status' => 'error',

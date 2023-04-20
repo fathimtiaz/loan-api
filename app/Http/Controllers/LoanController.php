@@ -30,6 +30,7 @@ class LoanController extends Controller
              
             DB::commit();    
         } catch (\Exception $e) {
+            report($e);
             DB::rollback();
             return response()->json([
                 'status' => 'error',
@@ -64,6 +65,7 @@ class LoanController extends Controller
             $page_items = ($request->query('page_items') != NULl) ? $request->query('page_items') : 10;
             $loans = $loans->paginate($page_items);
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'status' => 'error',
                 'message' => 'loan not found'
@@ -94,6 +96,7 @@ class LoanController extends Controller
 
             $loan = $loan->firstOrFail();
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'status' => 'error',
                 'message' => 'loan not found'
@@ -114,6 +117,7 @@ class LoanController extends Controller
         try {
             $loan = Loan::where('id', $id)->firstOrFail();
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'status' => 'error',
                 'message' => 'loan not found'
@@ -139,6 +143,7 @@ class LoanController extends Controller
              
             DB::commit();    
         } catch (\Exception $e) {
+            report($e);
             DB::rollback();
             return response()->json([
                 'status' => 'error',

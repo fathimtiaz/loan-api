@@ -20,6 +20,7 @@ class AuthController extends Controller
         try {
             $user = User::where('email', $request->email)->first();
         } catch (\Exception $e) {
+            report($e);
             return response()->json([
                 'status' => 'error',
                 'message' => 'not found'
