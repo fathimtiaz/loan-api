@@ -65,14 +65,12 @@ class User extends Authenticatable
     }
 
     public function isAdmin() {
-        $result = false;
-
         foreach($this->roles as $role) {
-            if ($result = $role == 'admin') {
-                break;
+            if ($role->name == 'admin') {
+                return true;
             }
         }
 
-        return $result;
+        return false;
     }
 }

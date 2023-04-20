@@ -56,14 +56,14 @@ class LoanController extends Controller
         $user = User::where('id', $user_id)->first();
 
         try {
+            $page_items = ($request->query('page_items') != NULl) ? $request->query('page_items') : 10;
+
             if (!$user->isAdmin()) {
-                $loans = Loan::where('user_id', $user_id);
+                $loans = Loan::where('user_id', $user_id)->paginate($page_items);
             } else {
-                $loans = Loan::all();
+                $loans = Loan::paginate($page_items);
             }
 
-            $page_items = ($request->query('page_items') != NULl) ? $request->query('page_items') : 10;
-            $loans = $loans->paginate($page_items);
         } catch (\Exception $e) {
             report($e);
             return response()->json([
