@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\LoanTerm;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class LoanController extends Controller
@@ -38,6 +39,66 @@ class LoanController extends Controller
 
         $loan = Loan::where('id', $loan->id)->first();
         $loan->terms;
+
+        return response()->json([
+            'status' => 'success',
+            'loan' => $loan
+        ], 200);
+    }
+
+    /**
+     * all a new loan for an authenticated customer user.
+     */
+    public function all(Request $request)
+    {
+        $user_id = auth()->user()->id;
+        $user = User::where('id', $user_id)->first();
+
+        try {
+            if (!$user->isAdmin()) {
+                $loans = Loan::where('user_id', $user_id);
+            } else {
+                $loans = Loan::all();
+            }
+
+            $page_items = ($request->query('page_items') != NULl) ? $request->query('page_items') : 10;
+            $loans = $loans->paginate($page_items);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'loan not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'loans' => $loans->all(),
+            'pagination' =>$loans
+        ], 200);
+    }
+
+    /**
+     * show a new loan for an authenticated customer user.
+     */
+    public function show(string $id, Request $request)
+    {
+        $user_id = auth()->user()->id;
+        $user = User::where('id', $user_id)->first();
+        
+        try {
+            $loan = Loan::where('id', $id);
+
+            if (!$user->isAdmin()) {
+                $loan = $loan->where('user_id', $user_id);
+            }
+
+            $loan = $loan->firstOrFail();
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'loan not found'
+            ], 404);
+        }
 
         return response()->json([
             'status' => 'success',
