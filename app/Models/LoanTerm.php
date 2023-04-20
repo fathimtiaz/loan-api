@@ -11,6 +11,10 @@ class LoanTerm extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     public const TERM_INTERVAL_DAYS = '7';
 
     public function __construct(array $attributes = array())

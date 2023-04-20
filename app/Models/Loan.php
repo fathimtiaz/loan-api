@@ -12,6 +12,10 @@ class Loan extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     public const STATE_PENDING = 'PENDING';
     public const STATE_APPROVED = 'APPROVED';
     public const STATE_PAID = 'PAID';

@@ -11,6 +11,10 @@ class Repayment extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     public function __construct(array $attributes = array())
     {
         parent::__construct($attributes);

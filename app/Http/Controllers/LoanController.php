@@ -29,7 +29,6 @@ class LoanController extends Controller
              
             DB::commit();    
         } catch (\Exception $e) {
-            print_r($e->getMessage());
             DB::rollback();
             return response()->json([
                 'status' => 'error',
@@ -96,7 +95,7 @@ class LoanController extends Controller
     {
         $loan = new Loan;
         
-        $loan->user_id = $request->header('user_id');
+        $loan->user_id = auth()->user()->id;
         $loan->total_amount = $request->amount;
         $loan->number_of_terms = $request->number_of_terms;
         $loan->state = Loan::STATE_PENDING;
