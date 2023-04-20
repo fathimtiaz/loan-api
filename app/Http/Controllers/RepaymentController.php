@@ -107,15 +107,27 @@ class RepaymentController extends Controller
                 ], 400);
             }
 
+            // update this loan term
             $this_loan_term->paid_amount += $this_repay_amount;
             $this_loan_term->state = ($this_loan_term->amount == $this_loan_term->paid_amount) ? Loan::STATE_PAID : Loan::STATE_APPROVED;
-
+            
+            
+            if ($this_loan_term->state == Loan::STATE_PAID) {
+                $this_loan_term->paid_at = now();
+            }
+            
             $this_loan_term->save();
-
+            
+            // update loan
+            $loan->paid_amount += $this_repay_amount;
+            
             if ($this_loan_term->term_number == $loan->number_of_terms && $this_loan_term->state == Loan::STATE_PAID) {
                 $loan->state = Loan::STATE_PAID;
+                $loan->paid_at = now();
             }
-    
+            
+            $loan->save();
+            
             $repay_amount -= $this_loan_term_unpaid_amount;
         }
 
